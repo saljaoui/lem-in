@@ -2,14 +2,16 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"strings"
 )
 
 // Graph represents a graph using an adjacency list.
 type Graph struct {
 	adjacencyList map[string][]string
-}
 
+}
 // NewGraph creates a new graph.
 func NewGraph() *Graph {
 	return &Graph{adjacencyList: make(map[string][]string)}
@@ -18,7 +20,7 @@ func NewGraph() *Graph {
 // AddEdge adds an edge to the graph.
 func (g *Graph) AddEdge(from, to string) {
 	g.adjacencyList[from] = append(g.adjacencyList[from], to)
-	// g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
+	g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
 }
 
 // BFS performs Breadth-First Search starting from the given start node to find the shortest path to end node.
@@ -75,16 +77,32 @@ func (g *Graph) AddRoom(room string) {
 func main() {
 	// Create a new graph and add edges.
 	graph := NewGraph()
-	edges := []string{"0-2", "0-1", "1-2", "1-3", "1-4", "3-5", "5-7", "5-6"}
-	for _, s := range edges {
+	// edges := []string{"0-1", "0-3", "0-2", "2-5", "3-6", "1-4", "4-6"}
+
+	content, err := os.ReadFile("test.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	var start string
+	var end string
+	contentStr := string(content)
+	edges := strings.Split(contentStr, "\n")
+	for i, s := range edges {
 		parts := strings.Split(s, "-")
 		if len(parts) == 2 {
+			fmt.Println(parts)
 			graph.AddEdge(parts[0], parts[1])
+		} else if strings.HasPrefix(s, "##start") {
+			start = edges[i+1]
+		} else if strings.HasPrefix(s, "##end") {
+			end = edges[i+1]
 		}
 	}
 
 	// Perform BFS starting from node "0" to find the path to node "5".
 	fmt.Println("Shortest path from node 0 to node 5:")
-	path := graph.BFS("0", "5")
+	fmt.Println(start[:1])
+	fmt.Println(end[:1])
+	path := graph.BFS(start[:1], end[:1])
 	fmt.Println(path)
 }
