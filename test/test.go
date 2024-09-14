@@ -21,68 +21,58 @@ func (g *Graph) AddEdge(from, to string) {
 	g.adjacencyList[to] = append(g.adjacencyList[to], from)
 }
 
+func (g *Graph) BFS(start, end string) [][]string {
+    var allPaths [][]string
+    queue := [][]string{{start}}
+    visited := make(map[string]bool)
 
-func (g *Graph) BFS(start, end string) []string {
-	visited := make(map[string]bool)
-	queue := []string{}
-	parent := make(map[string]string) 
-	var paths []string
+    for len(queue) > 0 {
+        path := queue[0]
+        queue = queue[1:]
+        node := path[len(path)-1]
 
+        if node == end {
+            allPaths = append(allPaths, path)
+            continue // Continue to explore other paths
+        }
 
+        if visited[node] {
+            continue
+        }
+        visited[node] = true
 
-	queue = append(queue, start)
-	visited[start] = true
-	parent[start] = "" 
-
-	for len(queue) > 0 {
-
-		node := queue[0]
-		queue = queue[1:]
-
-
-		if node == end {
-		 path := reconstructPath(parent, end)
-		 
-		 visited = make(map[string]bool)
-		 parent = make(map[string]string)
-		 queue = nil
-		 queue = append(queue, start)
-		 visited[start] = true
-		 parent[start] = ""
-
-		paths = append(paths, path...)
-		 for _, p := range paths {
-			if p != end {
-				visited[p] = true
-			}
-		 }
-		 node = queue[0]
-		 queue = queue[1:]
-		 fmt.Println(path)
-		}
-
-
-		for _, neighbor := range g.adjacencyList[node] {
-			if !visited[neighbor] {
-				queue = append(queue, neighbor)
-				visited[neighbor] = true
-				parent[neighbor] = node
-			}
-		}
-	}
-
-
-	return []string{}
+        for _, neighbor := range g.adjacencyList[node] {
+            if !contains(path, neighbor) {
+                newPath := make([]string, len(path))
+                copy(newPath, path)
+                newPath = append(newPath, neighbor)
+                queue = append(queue, newPath)
+            }
+        }
+    }
+    return allPaths
 }
 
 
-func reconstructPath(parent map[string]string, end string) []string {
-	var path []string
-	for node := end; node != ""; node = parent[node] {
-		path = append([]string{node}, path...) 
-	}
-	return path
+
+// Helper function to check if a slice contains a string
+func contains(slice []string, item string) bool {
+    for _, v := range slice {
+        if v == item {
+            return true
+        }
+    }
+    return false
 }
+
+// func reconstructPath(parent map[string]string, end string) []string {
+//     var path []string
+//     for node := end; node != ""; node = parent[node] {
+//         path = append([]string{node}, path...)
+//     }
+// 	return path
+// }
+
 
 func (g *Graph) AddRoom(room string) {
 	if _, exists := g.adjacencyList[room]; !exists {
@@ -120,5 +110,6 @@ func main() {
 	fmt.Println(start[:1])
 	fmt.Println(end[:1])
 	path := graph.BFS(start[:1], end[:1])
-_= path
+	fmt.Println(path)
+
 }
