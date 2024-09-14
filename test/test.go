@@ -58,11 +58,8 @@ func (g *Graph) BFS(start, end string) []string {
 				visited[p] = true
 			}
 		 }
-
-
 		 node = queue[0]
 		 queue = queue[1:]
-
 		 fmt.Println(path)
 		}
 
