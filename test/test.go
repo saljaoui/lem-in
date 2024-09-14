@@ -28,6 +28,8 @@ func (g *Graph) BFS(start, end string) []string {
 	visited := make(map[string]bool)
 	queue := []string{}
 	parent := make(map[string]string) // Maps node to its predecessor
+	var paths []string
+
 
 	// Enqueue the start node and mark it as visited.
 	queue = append(queue, start)
@@ -41,7 +43,27 @@ func (g *Graph) BFS(start, end string) []string {
 
 		// If we've reached the end node, reconstruct and return the path.
 		if node == end {
-			return reconstructPath(parent, end)
+		 path := reconstructPath(parent, end)
+		 
+		 visited = make(map[string]bool)
+		 parent = make(map[string]string)
+		 queue = nil
+		 queue = append(queue, start)
+		 visited[start] = true
+		 parent[start] = ""
+
+		paths = append(paths, path...)
+		 for _, p := range paths {
+			if p != end {
+				visited[p] = true
+			}
+		 }
+
+
+		 node = queue[0]
+		 queue = queue[1:]
+
+		 fmt.Println(path)
 		}
 
 		// Enqueue all unvisited neighbors.
@@ -104,5 +126,5 @@ func main() {
 	fmt.Println(start[:1])
 	fmt.Println(end[:1])
 	path := graph.BFS(start[:1], end[:1])
-	fmt.Println(path)
+_= path
 }
