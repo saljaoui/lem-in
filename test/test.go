@@ -20,7 +20,7 @@ func NewGraph() *Graph {
 // AddEdge adds an edge to the graph.
 func (g *Graph) AddEdge(from, to string) {
 	g.adjacencyList[from] = append(g.adjacencyList[from], to)
-	g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
+	// g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
 }
 
 // BFS performs Breadth-First Search starting from the given start node to find the shortest path to end node.
