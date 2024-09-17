@@ -154,14 +154,7 @@ func main() {
 	// printOutput(prev, ants)
 }
 
-// func printOutput(paths [][]string, ant int) {
-// 	var ants = make([]string,ant) 
-// 	for i := 0; i <= len(paths); i++ {
-// 		for i, v := range ants {
-// 			if v != "" {
-// 			fmt.Print("L", i+1,"-",v)
-// 			}
-// 		}
-// 		fmt.Println()
-// 	}
+// func printOutput(paths [][]string, antCount int) {
+// 	roomsInPath := make(map[int]int)
+    
 // }
