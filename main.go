@@ -47,13 +47,49 @@ func (g *Graph) DFS(start, end string) [][]string {
 	}
 
 	dfs(start)
-	pathe := findUniqueArrays(paths)
-	fmt.Println(pathe)
-	return paths
+
+	pathe := findAllPathes(paths, start, end)
+	pathes := findShoresPathes(paths, start, end)
+	if  len(pathes) < len(pathe) {
+		return pathe
+	}
+	return pathes
+
 }
 
-func findUniqueArrays(arrays [][]string) [][]string {
+func findAllPathes(arrays [][]string, start ,end string) [][]string {
+	if len(arrays) == 0 {
+		return nil
+	}
 
+	result := [][]string{arrays[0]}
+	seen := make(map[string]bool)
+
+	// Mark all elements in the first array as seen
+	for _, elem := range arrays[0] {
+		seen[elem] = true
+	}
+
+	for _, arr := range arrays[1:] {
+		unique := true
+		for _, elem := range arr {
+			if elem != start && elem != end && seen[elem] {
+				unique = false
+				break
+			}
+		}
+		if unique {
+			result = append(result, arr)
+			for _, elem := range arr {
+				seen[elem] = true
+			}
+		}
+	}
+	return result
+}
+
+
+func findShoresPathes(arrays [][]string, start ,end string) [][]string {
 
 	if len(arrays) == 0 {
 		return nil
@@ -74,7 +110,7 @@ func findUniqueArrays(arrays [][]string) [][]string {
 	for _, arr := range arrays[1:] {
 		unique := true
 		for _, elem := range arr {
-			if elem != "0" && elem != "1" && seen[elem] {
+			if elem != start && elem != end && seen[elem] {
 				unique = false
 				break
 			}
@@ -86,7 +122,6 @@ func findUniqueArrays(arrays [][]string) [][]string {
 			}
 		}
 	}
-
 	return result
 }
 
@@ -109,16 +144,16 @@ func main() {
 			fmt.Println(parts)
 			graph.AddEdge(parts[0], parts[1])
 		} else if s == "##start" {
-			start = edges[i+1][:1]
+			start = edges[i+1]
 		} else if s == "##end" {
-			end = edges[i+1][:1]
+			end = edges[i+1]
 		}
 	}
 
 	// Perform BFS starting from node "0" to find the path to node "5".
-	fmt.Println("Shortest path from node 0 to node 5:")
+	fmt.Println("Shortest path from:")
 	fmt.Println(start)
 	fmt.Println(end)
 	path := graph.DFS(start, end)
-	_ = path
+	fmt.Println(path)
 }
