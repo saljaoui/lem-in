@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -50,47 +50,21 @@ func (g *Graph) DFS(start, end string) [][]string {
 
 	pathe := findAllPathes(paths, start, end)
 	pathes := findShoresPathes(paths, start, end)
-	if  len(pathes) < len(pathe) {
+	if len(pathes) < len(pathe) {
 		return pathe
 	}
 	return pathes
-
 }
 
-func findAllPathes(arrays [][]string, start ,end string) [][]string {
+func findAllPathes(arrays [][]string, start, end string) [][]string {
 	if len(arrays) == 0 {
 		return nil
 	}
 
-	result := [][]string{arrays[0]}
-	seen := make(map[string]bool)
-
-	// Mark all elements in the first array as seen
-	for _, elem := range arrays[0] {
-		seen[elem] = true
-	}
-
-	for _, arr := range arrays[1:] {
-		unique := true
-		for _, elem := range arr {
-			if elem != start && elem != end && seen[elem] {
-				unique = false
-				break
-			}
-		}
-		if unique {
-			result = append(result, arr)
-			for _, elem := range arr {
-				seen[elem] = true
-			}
-		}
-	}
-	return result
+	return find(arrays, start, end)
 }
 
-
-func findShoresPathes(arrays [][]string, start ,end string) [][]string {
-
+func findShoresPathes(arrays [][]string, start, end string) [][]string {
 	if len(arrays) == 0 {
 		return nil
 	}
@@ -99,10 +73,13 @@ func findShoresPathes(arrays [][]string, start ,end string) [][]string {
 		return len(arrays[i]) < len(arrays[j])
 	})
 
+	return find(arrays, start, end)
+}
+
+func find(arrays [][]string, start, end string) [][]string {
 	result := [][]string{arrays[0]}
 	seen := make(map[string]bool)
 
-	// Mark all elements in the first array as seen
 	for _, elem := range arrays[0] {
 		seen[elem] = true
 	}
@@ -126,34 +103,65 @@ func findShoresPathes(arrays [][]string, start ,end string) [][]string {
 }
 
 func main() {
-	// Create a new graph and add edges.
 	graph := NewGraph()
-	// edges := []string{"0-1", "0-3", "0-2", "2-5", "3-6", "1-4", "4-6"}
-
-	content, err := os.ReadFile("test.txt")
-	if err != nil {
-		log.Fatal(err)
+	if len(os.Args) != 2 {
+		fmt.Println("ERROR: invalid data format")
+		return
 	}
-	var start string
-	var end string
-	contentStr := string(content)
-	edges := strings.Split(contentStr, "\n")
-	for i, s := range edges {
-		parts := strings.Split(s, "-")
-		if len(parts) == 2 {
-			fmt.Println(parts)
-			graph.AddEdge(parts[0], parts[1])
-		} else if s == "##start" {
-			start = edges[i+1]
-		} else if s == "##end" {
-			end = edges[i+1]
+	file := os.Args[1]
+	s, err := os.ReadFile(file)
+	if err != nil {
+		fmt.Println("ERROR: invalid data format")
+		return
+	}
+	var ants int
+	str := strings.Split(string(s), "\n")
+	var start, end string
+	for i, v := range str {
+		if i == 0 {
+			ants, err = strconv.Atoi(v)
+			if err != nil || ants < 1 {
+				fmt.Println("ERROR: invalid data format")
+				return
+			}
+		}
+		if v == "##start" {
+			if i+1 < len(str) && len(str[i+1]) > 0 {
+				start = string(str[i+1][0])
+			} else {
+				fmt.Println("ERROR: invalid data format")
+				return
+			}
+		} else if v == "##end" {
+			if i+1 < len(str) && len(str[i+1]) > 0 {
+				end = string(str[i+1][0])
+			} else {
+				fmt.Println("ERROR: invalid data format")
+				return
+			}
+		}
+		st := strings.Split(v, "-")
+		if len(st) == 2 {
+			graph.AddEdge(st[0], st[1])
 		}
 	}
-
-	// Perform BFS starting from node "0" to find the path to node "5".
-	fmt.Println("Shortest path from:")
-	fmt.Println(start)
-	fmt.Println(end)
-	path := graph.DFS(start, end)
-	fmt.Println(path)
+	if start == "" || end == "" {
+		fmt.Println("ERROR: invalid data format")
+		return
+	}
+	prev := graph.DFS(start, end)
+	fmt.Println(prev)
+	// printOutput(prev, ants)
 }
+
+// func printOutput(paths [][]string, ant int) {
+// 	var ants = make([]string,ant) 
+// 	for i := 0; i <= len(paths); i++ {
+// 		for i, v := range ants {
+// 			if v != "" {
+// 			fmt.Print("L", i+1,"-",v)
+// 			}
+// 		}
+// 		fmt.Println()
+// 	}
+// }
