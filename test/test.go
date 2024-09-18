@@ -2,141 +2,78 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"os"
+	"sort"
 	"strings"
 )
 
-// Graph represents a graph using an adjacency list.
-type Graph struct {
-	adjacencyList map[string][]string
+type Path struct {
+	id    int
+	rooms []string
+	ants  int
 }
 
-// NewGraph creates a new graph.
-func NewGraph() *Graph {
-	return &Graph{adjacencyList: make(map[string][]string)}
+type Ant struct {
+	id       int
+	pathID   int
+	position int
 }
 
-// AddEdge adds an edge to the graph.
-func (g *Graph) AddEdge(from, to string) {
-	g.adjacencyList[from] = append(g.adjacencyList[from], to)
-	// g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
+func assignAntsToPath(paths []Path, antCount int) []Path {
+	for ant := 1; ant <= antCount; ant++ {
+		sort.Slice(paths, func(i, j int) bool {
+			return len(paths[i].rooms)+paths[i].ants < len(paths[j].rooms)+paths[j].ants
+		})
+		paths[0].ants++
+	}
+	return paths
 }
 
-// BFS performs Breadth-First Search starting from the given start node to find the shortest path to end node.
-func (g *Graph) BFS(start, end string) []string {
-	visited := make(map[string]bool)
-	queue := []string{}
-	parent := make(map[string]string) // Maps node to its predecessor
-	var paths []string
+func simulateAntMovement(stringPaths [][]string, antCount int) {
+	paths := make([]Path, len(stringPaths))
+	for i, rooms := range stringPaths {
+		paths[i] = Path{id: i + 1, rooms: rooms, ants: 0}
+	}
 
-	// Enqueue the start node and mark it as visited.
-	queue = append(queue, start)
-	visited[start] = true
-	parent[start] = "" // Start node has no parent
+	assignedPaths := assignAntsToPath(paths, antCount)
 
-	for len(queue) > 0 {
-		// Dequeue a node from the front of the queue.
-		node := queue[0]
-		queue = queue[1:]
-
-		// If we've reached the end node, reconstruct and return the path.
-		if node == end {
-			path := reconstructPath(parent, end)
-			slice := g.adjacencyList[start]
-			newSlice := []string{}
-			for _, value := range slice {
-				if value != path[1] {
-					newSlice = append(newSlice, value)
-				}
-			}
-			g.adjacencyList[start] = newSlice
-			// delete(g.adjacencyList, "0")
-
-			var res string
-			for _, s := range path {
-				res += s
-			}
-
-			visited = make(map[string]bool)
-			parent = make(map[string]string)
-			queue = nil
-			queue = append(queue, start)
-			visited[start] = true
-			parent[start] = ""
-
-			paths = append(paths, path...)
-			for _, p := range paths {
-				if p != end {
-					visited[p] = true
-				}
-			}
-
-			node = queue[0]
-			queue = queue[1:]
-		
-			fmt.Println(path)
-		}
-
-		// Enqueue all unvisited neighbors.
-		for _, neighbor := range g.adjacencyList[node] {
-			if !visited[neighbor] {
-				queue = append(queue, neighbor)
-				visited[neighbor] = true
-				parent[neighbor] = node
-			}
+	ants := make([]Ant, antCount)
+	antIndex := 0
+	for _, path := range assignedPaths {
+		for i := 0; i < path.ants; i++ {
+			ants[antIndex] = Ant{id: antIndex + 1, pathID: path.id, position: -1} // Start before first room
+			antIndex++
 		}
 	}
 
-	// Return an empty path if no path is found
-	return []string{}
-}
-
-// reconstructPath reconstructs the path from start to end using the parent map.
-func reconstructPath(parent map[string]string, end string) []string {
-	var path []string
-	for node := end; node != ""; node = parent[node] {
-		path = append([]string{node}, path...) // Prepend node to path
+	maxSteps := 0
+	for _, path := range paths {
+		if len(path.rooms) > maxSteps {
+			maxSteps = len(path.rooms)
+		}
 	}
-	return path
-}
 
-// AddRoom adds a new room to the graph with no edges.
-func (g *Graph) AddRoom(room string) {
-	if _, exists := g.adjacencyList[room]; !exists {
-		g.adjacencyList[room] = nil
+	for step := 0; step < maxSteps; step++ {
+		moves := []string{}
+		for i := range ants {
+			if ants[i].position < len(paths[ants[i].pathID-1].rooms) - 1 {
+				ants[i].position++
+				currentRoom := paths[ants[i].pathID-1].rooms[ants[i].position]
+				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, currentRoom))
+			}
+		}
+		if len(moves) > 0 {
+			fmt.Println(strings.Join(moves, " "))
+		}
 	}
 }
 
 func main() {
-	// Create a new graph and add edges.
-	graph := NewGraph()
-	// edges := []string{"0-1", "0-3", "0-2", "2-5", "3-6", "1-4", "4-6"}
-
-	content, err := os.ReadFile("test.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-	var start string
-	var end string
-	contentStr := string(content)
-	edges := strings.Split(contentStr, "\n")
-	for i, s := range edges {
-		parts := strings.Split(s, "-")
-		if len(parts) == 2 {
-			fmt.Println(parts)
-			graph.AddEdge(parts[0], parts[1])
-		} else if s ==  "##start" {
-			start = edges[i+1]
-		} else if s == "##end" {
-			end = edges[i+1]
-		}
+	stringPaths := [][]string{
+		{"0", "3"},
+		{"0", "1", "2", "3"},
 	}
 
-	// Perform BFS starting from node "0" to find the path to node "5".
-	fmt.Println("Shortest path from node 0 to node 5:")
-	fmt.Println(start)
-	fmt.Println(end)
-	path := graph.BFS(start, end)
-	_ = path
+	antCount := 6
+
+	simulateAntMovement(stringPaths, antCount)
 }

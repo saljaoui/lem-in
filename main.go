@@ -151,10 +151,33 @@ func main() {
 	}
 	prev := graph.DFS(start, end)
 	fmt.Println(prev)
-	// printOutput(prev, ants)
+	simulateAntMovement(prev, ants)
 }
 
-// func printOutput(paths [][]string, antCount int) {
-// 	roomsInPath := make(map[int]int)
+type Path struct {
+	id int
+	rooms []string
+	ants int
+
+}
+
+func simulateAntMovement(stringPaths [][]string, antCount int) {
+	paths := make([]Path, len(stringPaths))
+
+	for i, romms := range stringPaths {
+		paths[i] = Path{id:i+1, rooms: romms, ants: 0}
+	}
+	fmt.Println(paths)
+
+	assignedPaths := assignAntsToPath(paths, antCount)
+
+	for ant := 1; ant <= antCount; ant++ {
+
+	}
+
     
-// }
+}
+
+func assignAntsToPath(paths []Path , antCount int) []Path {
+
+}
