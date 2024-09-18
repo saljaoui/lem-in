@@ -171,13 +171,16 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 
 	assignedPaths := assignAntsToPath(paths, antCount)
 
-	for ant := 1; ant <= antCount; ant++ {
-
-	}
-
+_= assignedPaths
     
 }
 
 func assignAntsToPath(paths []Path , antCount int) []Path {
-
+	for ant := 1; ant <= antCount; ant++ {
+		sort.Slice(paths, func(i, j int) bool {
+			return len(paths[i].rooms)+paths[i].ants < len(paths[j].rooms)+paths[j].ants
+		})
+		paths[0].ants++
+	}
+ return nil
 }
