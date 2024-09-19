@@ -84,7 +84,6 @@ func find(arrays [][]string, start, end string) [][]string {
 	seen := make(map[string]bool)
 
 	for _, elem := range arrays[0] {
-
 		seen[elem] = true
 	}
 
@@ -156,8 +155,8 @@ func main() {
 		return
 	}
 	prev := graph.DFS(start, end)
-var res []string
-var save [][]string
+	var res []string
+	var save [][]string
 	for _, s := range prev {
 		res = append(res, s[1:]...)
 		save = append(save, res)
@@ -211,8 +210,7 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 				// 	ants[i+2].position++
 				// 	moves = append(moves, fmt.Sprintf("L%d-%s", ants[i+2].id, ants[i+2].path[ants[i+2].position]))
 				// }
-				
-				
+
 			}
 		}
 		if len(moves) > 0 {
@@ -225,10 +223,11 @@ func assignAntsToPath(paths []Path, antCount int) []Ant {
 	ants := make([]Ant, antCount)
 	antIndex := 0
 
-for ant := 1; ant <= antCount; ant++ {
+	for ant := 1; ant <= antCount; ant++ {
 		sort.Slice(paths, func(i, j int) bool {
-			return len(paths[i].rooms)+paths[i].ants < len(paths[j].rooms)+paths[j].ants
+			return len(paths[i].rooms)+paths[i].ants <= len(paths[j].rooms)+paths[j].ants
 		})
+
 		paths[0].ants++
 	}
 
@@ -236,22 +235,31 @@ for ant := 1; ant <= antCount; ant++ {
 		return len(paths[i].rooms) < len(paths[j].rooms)
 	})
 
-p := 0
-	for antIndex < antCount {
-if p == 0 {
-	paths[p].ants++
-} else {
-	paths[p].ants++
-	ants[antIndex] = Ant{id: antIndex + 1, path: paths[p].rooms, position: -1}
-	antIndex++
-	p = 0
-	continue
+// First, assign ants alternating between paths
+for antIndex < antCount && paths[0].ants > 0 && paths[1].ants > 0 {
+	for i := range paths {
+		if paths[i].ants > 0 {
+			ants[antIndex] = Ant{id: antIndex + 1, path: paths[i].rooms, position: -1}
+			antIndex++
+			paths[i].ants--
+		}
+		if antIndex >= antCount {
+			break
+		}
+	}
 }
 
-		ants[antIndex] = Ant{id: antIndex + 1, path: paths[p].rooms, position: -1}
-		antIndex++
-		p = 1
+// Then, assign remaining ants to paths that still have ants
+for antIndex < antCount {
+	for i := range paths {
+		if paths[i].ants > 0 {
+			ants[antIndex] = Ant{id: antIndex + 1, path: paths[i].rooms, position: -1}
+			antIndex++
+			paths[i].ants--
+			break
+		}
 	}
+}
 
 	return ants
 }
