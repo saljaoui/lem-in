@@ -205,10 +205,13 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 		for i := range ants {
 
 			 if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && i < allsteps {
+				if i == len(ants)-1 {
+					fmt.Printf("hi")
+				}
 				ants[i].position++
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
-
+			
 
 			if ants[i].position == len(ants[i].path)-1 {
 				ants[i].isEnd = true
