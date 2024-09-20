@@ -180,6 +180,28 @@ type Path struct {
 	ants  int
 }
 
+func isRoomAvailable(ants []Ant, currentAnt Ant, nextPosition int) bool {
+	for _, ant := range ants {
+		if ant.position == nextPosition && pathsMatch(ant.path, currentAnt.path) {
+			return false // Room is occupied
+		}
+	}
+	return true // Room is available
+}
+
+// Helper function to check if two paths are the same
+func pathsMatch(path1, path2 []string) bool {
+	if len(path1) != len(path2) {
+		return false
+	}
+	for i := range path1 {
+		if path1[i] != path2[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func simulateAntMovement(stringPaths [][]string, antCount int) {
 	paths := make([]Path, len(stringPaths))
 	for i, rooms := range stringPaths {
@@ -199,14 +221,18 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 
 	for step := 0; step < maxSteps+antCount+100; step++ {
 		antSteps := 0
-
 		var moves []string
-		for i := range ants {
 
-			if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && antSteps < allsteps {
-				ants[i].position++
-				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
-				antSteps++
+		for i := range ants {
+			if ants[i].position < len(ants[i].path)-1 {
+				nextPosition := ants[i].position + 1
+
+				// Check if the next room is available
+				if isRoomAvailable(ants, ants[i], nextPosition) {
+					ants[i].position++
+					moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
+					antSteps++
+				}
 			}
 
 			if ants[i].position == len(ants[i].path)-1 {
@@ -229,7 +255,6 @@ func assignAntsToPath(paths []Path, antCount int) []Ant {
 		sort.Slice(paths, func(i, j int) bool {
 			return len(paths[i].rooms)+paths[i].ants <= len(paths[j].rooms)+paths[j].ants
 		})
-
 		paths[0].ants++
 	}
 
