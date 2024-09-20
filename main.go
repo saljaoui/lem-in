@@ -198,15 +198,24 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 	}
 
 	allsteps := len(stringPaths)
-
+ok := false
 	for step := 0; step < maxSteps+antCount+15; step++ {
-		
+		s := make(map[string]bool)
 		var moves []string
+		
 		for i := range ants {
 
 			 if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && i < allsteps {
 
+				
+				
 				ants[i].position++
+				if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] {
+					ok = true 
+					ants[i].position--
+					continue
+				}
+				s[ants[i].path[ants[i].position]] = true
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
 			
