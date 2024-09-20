@@ -171,14 +171,13 @@ type Ant struct {
 	id       int
 	path     []string
 	position int
-	isEnd bool
+	isEnd    bool
 }
 
 type Path struct {
 	id    int
 	rooms []string
 	ants  int
-	
 }
 
 func simulateAntMovement(stringPaths [][]string, antCount int) {
@@ -197,26 +196,25 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 	}
 
 	allsteps := len(stringPaths)
-	
+
 	for step := 0; step < maxSteps+antCount+100; step++ {
 		antSteps := 0
-		
+
 		var moves []string
 		for i := range ants {
-			
-			if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && antSteps < allsteps  {
+
+			if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && antSteps < allsteps {
 				ants[i].position++
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
-				antSteps ++
+				antSteps++
 			}
+
 			if ants[i].position == len(ants[i].path)-1 {
 				ants[i].isEnd = true
-		
 			}
 		}
 
 		allsteps += len(stringPaths)
-
 		if len(moves) > 0 {
 			fmt.Println(strings.Join(moves, " "))
 		}
