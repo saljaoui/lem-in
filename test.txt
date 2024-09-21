@@ -1,0 +1,17 @@
+1
+##start
+richard S S
+gilfoyle 6 3
+erlich 9 6
+dinish 6 9
+jimYoung 11 7
+##end
+peter 0 0
+richard-dinish
+dinish-jimYoung
+richard-gilfoyle
+gilfoyle-peter
+gilfoyle-erlich
+richard-erlich
+erlich-jimYoung
+jimYoung-peter

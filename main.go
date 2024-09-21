@@ -125,33 +125,38 @@ func main() {
 			ants, err = strconv.Atoi(v)
 
 			if err != nil || ants < 1 {
-				fmt.Println("ERROR: invalid data format")
+				fmt.Println("ERROR: invalid data format, invalid number of Ants")
 				return
 			}
 			continue
 		}
 		if v == "##start" {
 			if i+1 < len(str) && len(str[i+1]) > 0 {
-				start = str[i+1]
-			} else {
-				fmt.Println("ERROR: invalid data format")
-				return
+				st := strings.Split(str[i+1], " ")
+				if len(st) == 3 {
+					start = st[0]
+				}
 			}
 		} else if v == "##end" {
 			if i+1 < len(str) && len(str[i+1]) > 0 {
-				end = str[i+1]
-			} else {
-				fmt.Println("ERROR: invalid data format")
-				return
+				st := strings.Split(str[i+1], " ")
+				if len(st) == 3 {
+					end = st[0]
+				}
 			}
 		}
+
 		st := strings.Split(v, "-")
 		if len(st) == 2 {
 			graph.AddEdge(st[0], st[1])
 		}
 	}
-	if start == "" || end == "" {
-		fmt.Println("ERROR: invalid data format")
+	if start == ""  {
+		fmt.Println("ERROR: invalid data format, no start room found")
+		return
+	}
+	if end == "" {
+		fmt.Println("ERROR: invalid data format, no end room found")
 		return
 	}
 	prev := graph.DFS(start, end)
