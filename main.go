@@ -155,6 +155,10 @@ func main() {
 		return
 	}
 	prev := graph.DFS(start, end)
+	if prev == nil {
+		fmt.Println("ERROR: invalid data format")
+		return
+	}
 	var res []string
 	var save [][]string
 	for _, s := range prev {
@@ -164,6 +168,7 @@ func main() {
 	}
 
 	fmt.Println(prev)
+	
 	simulateAntMovement(save, ants)
 }
 
@@ -171,7 +176,6 @@ type Ant struct {
 	id       int
 	path     []string
 	position int
-	isEnd    bool
 }
 
 type Path struct {
@@ -180,14 +184,12 @@ type Path struct {
 	ants  int
 }
 
-
 func simulateAntMovement(stringPaths [][]string, antCount int) {
 	paths := make([]Path, len(stringPaths))
 	for i, rooms := range stringPaths {
 		paths[i] = Path{id: i + 1, rooms: rooms, ants: 0}
 	}
 
-	
 	ants := assignAntsToPath(paths, antCount)
 
 	maxSteps := 0
@@ -198,43 +200,31 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 	}
 
 	allsteps := len(stringPaths)
-ok := false
+	ok := false
 	for step := 0; step < maxSteps+antCount+15; step++ {
 		s := make(map[string]bool)
 		var moves []string
-		
+
 		for i := range ants {
+			if ants[i].position < len(ants[i].path)-1 && i < allsteps {
 
-			 if !ants[i].isEnd && ants[i].position < len(ants[i].path)-1 && i < allsteps {
-
-				
-				
 				ants[i].position++
-				if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] {
-					ok = true 
+				if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] && ants[i].path[0] == ants[i-1].path[0] {
 					ants[i].position--
+					ok = true
 					continue
 				}
 				s[ants[i].path[ants[i].position]] = true
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
-			
-
-			if ants[i].position == len(ants[i].path)-1 {
-				ants[i].isEnd = true
-			}
 		}
-		
-
 		allsteps += len(stringPaths)
-		
+
 		if len(moves) > 0 {
 			fmt.Println(strings.Join(moves, " "))
 		}
 	}
-	
 }
-
 
 func assignAntsToPath(paths []Path, antCount int) []Ant {
 	ants := make([]Ant, antCount)
