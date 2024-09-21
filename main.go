@@ -205,20 +205,26 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 	}
 
 	allsteps := len(stringPaths)
-	ok := false
-	for step := 0; step < maxSteps+antCount+15; step++ {
+	// ok := false
+	for step := 0; step < maxSteps+antCount; step++ {
 		s := make(map[string]bool)
+		f := make(map[string]bool)
 		var moves []string
 
 		for i := range ants {
 			if ants[i].position < len(ants[i].path)-1 && i < allsteps {
 
 				ants[i].position++
-				if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] && ants[i].path[0] == ants[i-1].path[0] {
+				if s[ants[i].path[ants[i].position]] && f[ants[i].path[0]] {
 					ants[i].position--
-					ok = true
 					continue
 				}
+				// if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] && ants[i].path[0] == ants[i-1].path[0] {
+				// 	ants[i].position--
+				// 	ok = true
+				// 	continue
+				// }
+				f[ants[i].path[0]] = true
 				s[ants[i].path[ants[i].position]] = true
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
@@ -237,15 +243,19 @@ func assignAntsToPath(paths []Path, antCount int) []Ant {
 
 	for ant := 1; ant <= antCount; ant++ {
 		sort.Slice(paths, func(i, j int) bool {
-			return len(paths[i].rooms)+paths[i].ants <= len(paths[j].rooms)+paths[j].ants
+			return len(paths[i].rooms) < len(paths[j].rooms)
+		})
+		sort.Slice(paths, func(i, j int) bool {
+			return len(paths[i].rooms)+paths[i].ants < len(paths[j].rooms)+paths[j].ants
 		})
 		paths[0].ants++
 	}
 	fmt.Println(paths)
+	
 	sort.Slice(paths, func(i, j int) bool {
 		return len(paths[i].rooms) < len(paths[j].rooms)
 	})
-
+	
 	// First, assign ants alternating between paths
 	for antIndex < antCount && paths[0].ants > 0 {
 		for i := range paths {
