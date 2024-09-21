@@ -151,7 +151,7 @@ func main() {
 			graph.AddEdge(st[0], st[1])
 		}
 	}
-	if start == ""  {
+	if start == "" {
 		fmt.Println("ERROR: invalid data format, no start room found")
 		return
 	}
@@ -173,7 +173,7 @@ func main() {
 	}
 
 	fmt.Println(prev)
-	
+
 	simulateAntMovement(save, ants)
 }
 
@@ -204,33 +204,24 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 		}
 	}
 
-	allsteps := len(stringPaths)
-	// ok := false
+
 	for step := 0; step < maxSteps+antCount; step++ {
 		s := make(map[string]bool)
 		f := make(map[string]bool)
 		var moves []string
 
 		for i := range ants {
-			if ants[i].position < len(ants[i].path)-1 && i < allsteps {
-
+			if ants[i].position < len(ants[i].path)-1 {
 				ants[i].position++
 				if s[ants[i].path[ants[i].position]] && f[ants[i].path[0]] {
 					ants[i].position--
 					continue
 				}
-				// if i == len(ants)-1 && !ok && s[ants[i].path[ants[i].position]] && ants[i].path[0] == ants[i-1].path[0] {
-				// 	ants[i].position--
-				// 	ok = true
-				// 	continue
-				// }
 				f[ants[i].path[0]] = true
 				s[ants[i].path[ants[i].position]] = true
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
 		}
-		allsteps += len(stringPaths)
-
 		if len(moves) > 0 {
 			fmt.Println(strings.Join(moves, " "))
 		}
@@ -251,11 +242,11 @@ func assignAntsToPath(paths []Path, antCount int) []Ant {
 		paths[0].ants++
 	}
 	fmt.Println(paths)
-	
+
 	sort.Slice(paths, func(i, j int) bool {
 		return len(paths[i].rooms) < len(paths[j].rooms)
 	})
-	
+
 	// First, assign ants alternating between paths
 	for antIndex < antCount && paths[0].ants > 0 {
 		for i := range paths {
