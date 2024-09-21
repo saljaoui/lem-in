@@ -8,174 +8,170 @@ import (
 	"strings"
 )
 
-type Graph struct {
-	adjacencyList map[string][]string
+type AntGraph struct {
+	connections map[string][]string
 }
 
-func NewGraph() *Graph {
-	return &Graph{adjacencyList: make(map[string][]string)}
+func NewAntGraph() *AntGraph {
+	return &AntGraph{connections: make(map[string][]string)}
 }
 
-func (g *Graph) AddEdge(from, to string) {
-	g.adjacencyList[from] = append(g.adjacencyList[from], to)
-	g.adjacencyList[to] = append(g.adjacencyList[to], from) // For undirected graph
+func (g *AntGraph) ConnectRooms(room1, room2 string) {
+	g.connections[room1] = append(g.connections[room1], room2)
+	g.connections[room2] = append(g.connections[room2], room1) // For undirected graph
 }
 
-func (g *Graph) DFS(start, end string) [][]string {
-	var paths [][]string
+func (g *AntGraph) FindAllPaths(start, end string) [][]string {
+	var allPaths [][]string
 	visited := make(map[string]bool)
-	path := []string{start}
+	currentPath := []string{start}
 
-	var dfs func(node string)
-	dfs = func(node string) {
+	var depthFirstSearch func(node string)
+	depthFirstSearch = func(node string) {
 		if node == end {
-			pathCopy := make([]string, len(path))
-			copy(pathCopy, path)
-			paths = append(paths, pathCopy)
+			pathCopy := make([]string, len(currentPath))
+			copy(pathCopy, currentPath)
+			allPaths = append(allPaths, pathCopy)
 			return
 		}
 
 		visited[node] = true
-		for _, neighbor := range g.adjacencyList[node] {
+		for _, neighbor := range g.connections[node] {
 			if !visited[neighbor] {
-				path = append(path, neighbor)
-				dfs(neighbor)
-				path = path[:len(path)-1]
+				currentPath = append(currentPath, neighbor)
+				depthFirstSearch(neighbor)
+				currentPath = currentPath[:len(currentPath)-1]
 			}
 		}
 		visited[node] = false
 	}
 
-	dfs(start)
+	depthFirstSearch(start)
 
-	pathe := findAllPathes(paths, start, end)
+	allUniquePaths := findUniquePaths(allPaths, start, end)
+	shortestUniquePaths := findShortestUniquePaths(allPaths, start, end)
 
-	pathes := findShoresPathes(paths, start, end)
-
-	if len(pathes) < len(pathe) {
-		return pathe
+	if len(shortestUniquePaths) < len(allUniquePaths) {
+		return allUniquePaths
 	}
 
-	return pathes
+	return shortestUniquePaths
 }
 
-func findAllPathes(arrays [][]string, start, end string) [][]string {
-	if len(arrays) == 0 {
+func findUniquePaths(paths [][]string, start, end string) [][]string {
+	if len(paths) == 0 {
 		return nil
 	}
 
-	return find(arrays, start, end)
+	return filterUniquePaths(paths, start, end)
 }
 
-func findShoresPathes(arrays [][]string, start, end string) [][]string {
-	if len(arrays) == 0 {
+func findShortestUniquePaths(paths [][]string, start, end string) [][]string {
+	if len(paths) == 0 {
 		return nil
 	}
 
-	sort.Slice(arrays, func(i, j int) bool {
-		return len(arrays[i]) < len(arrays[j])
+	sort.Slice(paths, func(i, j int) bool {
+		return len(paths[i]) < len(paths[j])
 	})
 
-	return find(arrays, start, end)
+	return filterUniquePaths(paths, start, end)
 }
 
-func find(arrays [][]string, start, end string) [][]string {
-	result := [][]string{arrays[0]}
-	seen := make(map[string]bool)
+func filterUniquePaths(paths [][]string, start, end string) [][]string {
+	uniquePaths := [][]string{paths[0]}
+	seenRooms := make(map[string]bool)
 
-	for _, elem := range arrays[0] {
-		seen[elem] = true
+	for _, room := range paths[0] {
+		seenRooms[room] = true
 	}
 
-	for _, arr := range arrays[1:] {
-		unique := true
-		for _, elem := range arr {
-			if elem != start && elem != end && seen[elem] {
-				unique = false
+	for _, path := range paths[1:] {
+		isUnique := true
+		for _, room := range path {
+			if room != start && room != end && seenRooms[room] {
+				isUnique = false
 				break
 			}
 		}
-		if unique {
-			result = append(result, arr)
-			for _, elem := range arr {
-				seen[elem] = true
+		if isUnique {
+			uniquePaths = append(uniquePaths, path)
+			for _, room := range path {
+				seenRooms[room] = true
 			}
 		}
 	}
-	return result
+	return uniquePaths
 }
 
 func main() {
-	graph := NewGraph()
+	antGraph := NewAntGraph()
 	if len(os.Args) != 2 {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-	file := os.Args[1]
-	s, err := os.ReadFile(file)
+	inputFile := os.Args[1]
+	fileContent, err := os.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-	var ants int
-	str := strings.Split(string(s), "\n")
-	var start, end string
-	for i, v := range str {
+	var antCount int
+	lines := strings.Split(string(fileContent), "\n")
+	var startRoom, endRoom string
+	for i, line := range lines {
 		if i == 0 {
-			ants, err = strconv.Atoi(v)
+			antCount, err = strconv.Atoi(line)
 
-			if err != nil || ants < 1 {
+			if err != nil || antCount < 1 {
 				fmt.Println("ERROR: invalid data format, invalid number of Ants")
 				return
 			}
 			continue
 		}
-		if v == "##start" {
-			if i+1 < len(str) && len(str[i+1]) > 0 {
-				st := strings.Split(str[i+1], " ")
-				if len(st) == 3 {
-					start = st[0]
+		if line == "##start" {
+			if i+1 < len(lines) && len(lines[i+1]) > 0 {
+				roomInfo := strings.Split(lines[i+1], " ")
+				if len(roomInfo) == 3 {
+					startRoom = roomInfo[0]
 				}
 			}
-		} else if v == "##end" {
-			if i+1 < len(str) && len(str[i+1]) > 0 {
-				st := strings.Split(str[i+1], " ")
-				if len(st) == 3 {
-					end = st[0]
+		} else if line == "##end" {
+			if i+1 < len(lines) && len(lines[i+1]) > 0 {
+				roomInfo := strings.Split(lines[i+1], " ")
+				if len(roomInfo) == 3 {
+					endRoom = roomInfo[0]
 				}
 			}
 		}
 
-		st := strings.Split(v, "-")
-		if len(st) == 2 {
-			graph.AddEdge(st[0], st[1])
+		connection := strings.Split(line, "-")
+		if len(connection) == 2 {
+			antGraph.ConnectRooms(connection[0], connection[1])
 		}
 	}
-	if start == "" {
+	if startRoom == "" {
 		fmt.Println("ERROR: invalid data format, no start room found")
 		return
 	}
-	if end == "" {
+	if endRoom == "" {
 		fmt.Println("ERROR: invalid data format, no end room found")
 		return
 	}
-	prev := graph.DFS(start, end)
-	if prev == nil {
+	validPaths := antGraph.FindAllPaths(startRoom, endRoom)
+	if validPaths == nil {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
 
-	var res []string
-	var save [][]string
-	for _, s := range prev {
-		res = append(res, s[1:]...)
-		save = append(save, res)
-		res = nil
+	var pathsWithoutStart [][]string
+	for _, path := range validPaths {
+		pathsWithoutStart = append(pathsWithoutStart, path[1:])
 	}
-	fmt.Println(string(s))
+	fmt.Println(string(fileContent))
 	fmt.Println()
 
-	simulateAntMovement(save, ants)
+	simulateAntMovement(pathsWithoutStart, antCount)
 }
 
 type Ant struct {
@@ -190,35 +186,35 @@ type Path struct {
 	ants  int
 }
 
-func simulateAntMovement(stringPaths [][]string, antCount int) {
-	paths := make([]Path, len(stringPaths))
-	for i, rooms := range stringPaths {
+func simulateAntMovement(availablePaths [][]string, antCount int) {
+	paths := make([]Path, len(availablePaths))
+	for i, rooms := range availablePaths {
 		paths[i] = Path{id: i + 1, rooms: rooms, ants: 0}
 	}
 
-	ants := assignAntsToPath(paths, antCount)
+	ants := distributeAntsToPath(paths, antCount)
 
 	maxSteps := 0
-	for _, path := range stringPaths {
+	for _, path := range availablePaths {
 		if len(path) > maxSteps {
 			maxSteps = len(path)
 		}
 	}
 
 	for step := 0; step < maxSteps+antCount; step++ {
-		antPosition := make(map[string]bool)
-		pathAnt := make(map[string]bool)
+		roomOccupancy := make(map[string]bool)
+		pathUsed := make(map[string]bool)
 		var moves []string
 
 		for i := range ants {
 			if ants[i].position < len(ants[i].path)-1 {
 				ants[i].position++
-				if antPosition[ants[i].path[ants[i].position]] && pathAnt[ants[i].path[0]] {
+				if roomOccupancy[ants[i].path[ants[i].position]] && pathUsed[ants[i].path[0]] {
 					ants[i].position--
 					continue
 				}
-				pathAnt[ants[i].path[0]] = true
-				antPosition[ants[i].path[ants[i].position]] = true
+				pathUsed[ants[i].path[0]] = true
+				roomOccupancy[ants[i].path[ants[i].position]] = true
 				moves = append(moves, fmt.Sprintf("L%d-%s", ants[i].id, ants[i].path[ants[i].position]))
 			}
 		}
@@ -228,7 +224,7 @@ func simulateAntMovement(stringPaths [][]string, antCount int) {
 	}
 }
 
-func assignAntsToPath(paths []Path, antCount int) []Ant {
+func distributeAntsToPath(paths []Path, antCount int) []Ant {
 	ants := make([]Ant, antCount)
 	antIndex := 0
 
