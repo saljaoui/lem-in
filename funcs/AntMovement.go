@@ -22,12 +22,14 @@ func SimulateAntMovement(availablePaths [][]string, antCount int) {
 	}
 
 	for step := 0; step < maxSteps+antCount; step++ {
+		isEnd := false
 		roomOccupancy := make(map[string]bool)
 		pathUsed := make(map[string]bool)
 		var moves []string
 
 		for i := range ants {
 			if ants[i].position < len(ants[i].path)-1 {
+				isEnd = true
 				ants[i].position++
 				if roomOccupancy[ants[i].path[ants[i].position]] && pathUsed[ants[i].path[0]] {
 					ants[i].position--
@@ -40,6 +42,9 @@ func SimulateAntMovement(availablePaths [][]string, antCount int) {
 		}
 		if len(moves) > 0 {
 			fmt.Println(strings.Join(moves, " "))
+		}
+		if !isEnd {
+			break
 		}
 	}
 }

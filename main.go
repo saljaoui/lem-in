@@ -22,8 +22,8 @@ func main() {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
+
 	lines := strings.Split(string(fileContent), "\n")
-	
 	for i, line := range lines {
 		if i == 0 {
 			antGraph.Ants, err = strconv.Atoi(line)
@@ -52,7 +52,12 @@ func main() {
 
 		connection := strings.Split(line, "-")
 		if len(connection) == 2 {
+			if connection[0] == connection[1] || connection[0] == "" || connection[1] == "" {
+				fmt.Println("ERROR: invalid data format, invalid link room")
+				return
+			}
 			antGraph.ConnectRooms(connection[0], connection[1])
+
 		}
 	}
 	if antGraph.StartRoom == "" {
@@ -73,7 +78,7 @@ func main() {
 	for _, path := range validPaths {
 		pathsWithoutStart = append(pathsWithoutStart, path[1:])
 	}
-	
+
 	fmt.Println(string(fileContent))
 	fmt.Println()
 	funcs.SimulateAntMovement(pathsWithoutStart, antGraph.Ants)

@@ -13,7 +13,8 @@ type Path struct {
 }
 type AntGraph struct {
 	connections map[string][]string
-	Ants  int
-	StartRoom string
-	EndRoom string
+	seen        map[string]bool
+	Ants        int
+	StartRoom   string
+	EndRoom     string
 }

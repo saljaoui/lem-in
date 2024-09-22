@@ -1,7 +1,5 @@
 package funcs
 
-import "fmt"
-
 func (g *AntGraph) Dfs() [][]string {
 	var allPaths [][]string
 	visited := make(map[string]bool)
@@ -33,11 +31,10 @@ func (g *AntGraph) Dfs() [][]string {
 	}
 	allUniquePaths := g.FilterUniquePaths(allPaths)
 	shortestUniquePaths := g.FindShortestUniquePaths(allPaths)
-	fmt.Println(g.Ants)
+
 	if len(allUniquePaths) > g.Ants {
 		return shortestUniquePaths
-	}
-	if len(shortestUniquePaths) < len(allUniquePaths) {
+	} else if len(shortestUniquePaths) < len(allUniquePaths) {
 		return allUniquePaths
 	}
 

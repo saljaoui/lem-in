@@ -5,12 +5,17 @@ import "sort"
 func NewAntGraph() *AntGraph {
 	return &AntGraph{
 		connections: make(map[string][]string),
+		seen:        make(map[string]bool),
 	}
 }
 
 func (g *AntGraph) ConnectRooms(room1, room2 string) {
-	g.connections[room1] = append(g.connections[room1], room2)
-	g.connections[room2] = append(g.connections[room2], room1) // For undirected graph
+	if !g.seen[room1+room2] && !g.seen[room2+room1] {
+		g.seen[room1+room2] = true
+		g.seen[room2+room1] = true
+		g.connections[room1] = append(g.connections[room1], room2)
+		g.connections[room2] = append(g.connections[room2], room1) // For undirected graph
+	}
 }
 
 func (g *AntGraph) FindShortestUniquePaths(paths [][]string) [][]string {
