@@ -15,7 +15,7 @@ c 8 1
 k 11 2
 ##end
 end 11 6
-start-t
+start-f
 n-e
 a-m
 A-c
@@ -32,31 +32,3 @@ e-end
 c-k
 n-m
 h-n
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-
-start-end
-start-end
-
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-start-end
-
