@@ -19,6 +19,7 @@ func (g *AntGraph) ConnectRooms(room1, room2 string) {
 }
 
 func (g *AntGraph) FindShortestUniquePaths(paths [][]string) [][]string {
+	
 	sort.Slice(paths, func(i, j int) bool {
 		return len(paths[i]) < len(paths[j])
 	})
