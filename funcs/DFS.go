@@ -36,11 +36,10 @@ func (g *AntGraph) Dfs() [][]string {
 	fmt.Println(g.Ants)
 	if len(allUniquePaths) > g.Ants {
 		return shortestUniquePaths
-	} else if len(shortestUniquePaths) < len(allUniquePaths) {
+	}
+	if len(shortestUniquePaths) < len(allUniquePaths) {
 		return allUniquePaths
 	}
-	
-
 
 	return shortestUniquePaths
 }
