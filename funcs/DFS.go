@@ -1,6 +1,8 @@
 package funcs
 
-func (g *AntGraph) FindAllPaths() [][]string {
+import "fmt"
+
+func (g *AntGraph) Dfs() [][]string {
 	var allPaths [][]string
 	visited := make(map[string]bool)
 	currentPath := []string{g.StartRoom}
@@ -26,10 +28,12 @@ func (g *AntGraph) FindAllPaths() [][]string {
 	}
 
 	DepthFirstSearch(g.StartRoom)
-
-	allUniquePaths := g.FindUniquePaths(allPaths)
+	if len(allPaths) == 0 {
+		return nil
+	}
+	allUniquePaths := g.FilterUniquePaths(allPaths)
 	shortestUniquePaths := g.FindShortestUniquePaths(allPaths)
-
+	fmt.Println(g.Ants)
 	if len(allUniquePaths) > g.Ants {
 		return shortestUniquePaths
 	} else if len(shortestUniquePaths) < len(allUniquePaths) {

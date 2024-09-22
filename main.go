@@ -15,20 +15,20 @@ func main() {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
+
 	inputFile := os.Args[1]
 	fileContent, err := os.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println("ERROR: invalid data format")
 		return
 	}
-	var antCount int
 	lines := strings.Split(string(fileContent), "\n")
 	
 	for i, line := range lines {
 		if i == 0 {
-			antCount, err = strconv.Atoi(line)
+			antGraph.Ants, err = strconv.Atoi(line)
 
-			if err != nil || antCount < 1 {
+			if err != nil || antGraph.Ants < 1 {
 				fmt.Println("ERROR: invalid data format, invalid number of Ants")
 				return
 			}
@@ -63,7 +63,7 @@ func main() {
 		fmt.Println("ERROR: invalid data format, no end room found")
 		return
 	}
-	validPaths := antGraph.FindAllPaths()
+	validPaths := antGraph.Dfs()
 	if validPaths == nil {
 		fmt.Println("ERROR: invalid data format")
 		return
@@ -76,5 +76,5 @@ func main() {
 	
 	fmt.Println(string(fileContent))
 	fmt.Println()
-	funcs.SimulateAntMovement(pathsWithoutStart, antCount)
+	funcs.SimulateAntMovement(pathsWithoutStart, antGraph.Ants)
 }

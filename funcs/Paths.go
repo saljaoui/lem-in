@@ -5,8 +5,6 @@ import "sort"
 func NewAntGraph() *AntGraph {
 	return &AntGraph{
 		connections: make(map[string][]string),
-		Ants:        0,
-	
 	}
 }
 
@@ -15,19 +13,7 @@ func (g *AntGraph) ConnectRooms(room1, room2 string) {
 	g.connections[room2] = append(g.connections[room2], room1) // For undirected graph
 }
 
-func (g *AntGraph) FindUniquePaths(paths [][]string) [][]string {
-	if len(paths) == 0 {
-		return nil
-	}
-
-	return g.FilterUniquePaths(paths)
-}
-
 func (g *AntGraph) FindShortestUniquePaths(paths [][]string) [][]string {
-	if len(paths) == 0 {
-		return nil
-	}
-
 	sort.Slice(paths, func(i, j int) bool {
 		return len(paths[i]) < len(paths[j])
 	})
