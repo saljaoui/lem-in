@@ -23,7 +23,7 @@ func main() {
 	}
 	var antCount int
 	lines := strings.Split(string(fileContent), "\n")
-	var startRoom, endRoom string
+	
 	for i, line := range lines {
 		if i == 0 {
 			antCount, err = strconv.Atoi(line)
@@ -38,14 +38,14 @@ func main() {
 			if i+1 < len(lines) && len(lines[i+1]) > 0 {
 				roomInfo := strings.Split(lines[i+1], " ")
 				if len(roomInfo) == 3 {
-					startRoom = roomInfo[0]
+					antGraph.StartRoom = roomInfo[0]
 				}
 			}
 		} else if line == "##end" {
 			if i+1 < len(lines) && len(lines[i+1]) > 0 {
 				roomInfo := strings.Split(lines[i+1], " ")
 				if len(roomInfo) == 3 {
-					endRoom = roomInfo[0]
+					antGraph.EndRoom = roomInfo[0]
 				}
 			}
 		}
@@ -55,15 +55,15 @@ func main() {
 			antGraph.ConnectRooms(connection[0], connection[1])
 		}
 	}
-	if startRoom == "" {
+	if antGraph.StartRoom == "" {
 		fmt.Println("ERROR: invalid data format, no start room found")
 		return
 	}
-	if endRoom == "" {
+	if antGraph.EndRoom == "" {
 		fmt.Println("ERROR: invalid data format, no end room found")
 		return
 	}
-	validPaths := antGraph.FindAllPaths(startRoom, endRoom)
+	validPaths := antGraph.FindAllPaths()
 	if validPaths == nil {
 		fmt.Println("ERROR: invalid data format")
 		return

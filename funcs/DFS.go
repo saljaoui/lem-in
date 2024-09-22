@@ -1,13 +1,13 @@
 package funcs
 
-func (g *AntGraph) FindAllPaths(start, end string) [][]string {
+func (g *AntGraph) FindAllPaths() [][]string {
 	var allPaths [][]string
 	visited := make(map[string]bool)
-	currentPath := []string{start}
+	currentPath := []string{g.StartRoom}
 
 	var DepthFirstSearch func(node string)
 	DepthFirstSearch = func(node string) {
-		if node == end {
+		if node == g.EndRoom {
 			pathCopy := make([]string, len(currentPath))
 			copy(pathCopy, currentPath)
 			allPaths = append(allPaths, pathCopy)
@@ -25,10 +25,10 @@ func (g *AntGraph) FindAllPaths(start, end string) [][]string {
 		visited[node] = false
 	}
 
-	DepthFirstSearch(start)
+	DepthFirstSearch(g.StartRoom)
 
-	allUniquePaths := FindUniquePaths(allPaths, start, end)
-	shortestUniquePaths := FindShortestUniquePaths(allPaths, start, end)
+	allUniquePaths := g.FindUniquePaths(allPaths)
+	shortestUniquePaths := g.FindShortestUniquePaths(allPaths)
 
 	if len(shortestUniquePaths) < len(allUniquePaths) {
 		return allUniquePaths

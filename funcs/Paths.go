@@ -3,7 +3,11 @@ package funcs
 import "sort"
 
 func NewAntGraph() *AntGraph {
-	return &AntGraph{connections: make(map[string][]string)}
+	return &AntGraph{
+		connections: make(map[string][]string),
+		Ants:        0,
+	
+	}
 }
 
 func (g *AntGraph) ConnectRooms(room1, room2 string) {
@@ -11,15 +15,15 @@ func (g *AntGraph) ConnectRooms(room1, room2 string) {
 	g.connections[room2] = append(g.connections[room2], room1) // For undirected graph
 }
 
-func FindUniquePaths(paths [][]string, start, end string) [][]string {
+func (g *AntGraph) FindUniquePaths(paths [][]string) [][]string {
 	if len(paths) == 0 {
 		return nil
 	}
 
-	return FilterUniquePaths(paths, start, end)
+	return g.FilterUniquePaths(paths)
 }
 
-func FindShortestUniquePaths(paths [][]string, start, end string) [][]string {
+func (g *AntGraph) FindShortestUniquePaths(paths [][]string) [][]string {
 	if len(paths) == 0 {
 		return nil
 	}
@@ -28,10 +32,10 @@ func FindShortestUniquePaths(paths [][]string, start, end string) [][]string {
 		return len(paths[i]) < len(paths[j])
 	})
 
-	return FilterUniquePaths(paths, start, end)
+	return g.FilterUniquePaths(paths)
 }
 
-func FilterUniquePaths(paths [][]string, start, end string) [][]string {
+func (g *AntGraph) FilterUniquePaths(paths [][]string) [][]string {
 	uniquePaths := [][]string{paths[0]}
 	seenRooms := make(map[string]bool)
 
@@ -42,7 +46,7 @@ func FilterUniquePaths(paths [][]string, start, end string) [][]string {
 	for _, path := range paths[1:] {
 		isUnique := true
 		for _, room := range path {
-			if room != start && room != end && seenRooms[room] {
+			if room != g.StartRoom && room != g.EndRoom && seenRooms[room] {
 				isUnique = false
 				break
 			}
