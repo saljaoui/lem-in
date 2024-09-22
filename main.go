@@ -73,8 +73,8 @@ func main() {
 	for _, path := range validPaths {
 		pathsWithoutStart = append(pathsWithoutStart, path[1:])
 	}
+	
 	fmt.Println(string(fileContent))
 	fmt.Println()
-
 	funcs.SimulateAntMovement(pathsWithoutStart, antCount)
 }

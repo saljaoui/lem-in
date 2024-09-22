@@ -30,9 +30,13 @@ func (g *AntGraph) FindAllPaths() [][]string {
 	allUniquePaths := g.FindUniquePaths(allPaths)
 	shortestUniquePaths := g.FindShortestUniquePaths(allPaths)
 
-	if len(shortestUniquePaths) < len(allUniquePaths) {
+	if len(allUniquePaths) > g.Ants {
+		return shortestUniquePaths
+	} else if len(shortestUniquePaths) < len(allUniquePaths) {
 		return allUniquePaths
 	}
+	
+
 
 	return shortestUniquePaths
 }
